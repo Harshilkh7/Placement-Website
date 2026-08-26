@@ -1,16 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { CheckCircle, Circle, Clock, ChevronRight } from 'lucide-react';
+import { CheckCircle, Circle, Clock, ChevronRight, Map } from 'lucide-react';
 
 const Roadmap = () => {
   const { data: roadmap, isLoading, error } = useQuery({
     queryKey: ['roadmap'],
     queryFn: async () => {
+      const accessToken = localStorage.getItem('accessToken');
       const response = await axios.get('/api/roadmaps/me', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
+        headers: accessToken ? { Authorization: 'Bearer ' + accessToken } : {}
       });
       return response.data;
-    }
+    },
   });
 
   if (isLoading) return <div className="p-8">Loading roadmap...</div>;

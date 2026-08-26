@@ -6,11 +6,12 @@ const Experiences = () => {
   const { data: experiences, isLoading } = useQuery({
     queryKey: ['experiences'],
     queryFn: async () => {
+      const accessToken = localStorage.getItem('accessToken');
       const response = await axios.get('/api/experiences', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
+        headers: accessToken ? { Authorization: 'Bearer ' + accessToken } : {}
       });
       return response.data;
-    }
+    },
   });
 
   if (isLoading) return <div className="p-8">Loading experiences...</div>;
@@ -35,8 +36,8 @@ const Experiences = () => {
                 <div className="w-14 h-14 bg-surface-50 rounded-2xl flex items-center justify-center border border-surface-100 group-hover:border-primary-200 transition-colors">
                   <Building2 className="text-primary-600" size={32} />
                 </div>
-                <span className={`badge ${exp.verdict === 'Selected' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'} font-black px-4 py-1.5 rounded-full text-sm`}>
-                  {exp.verdict || 'Reviewed'}
+                <span className={`badge ${exp.offerStatus === 'Accepted' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'} font-black px-4 py-1.5 rounded-full text-sm`}>
+                  {exp.offerStatus || 'Reviewed'}
                 </span>
               </div>
 

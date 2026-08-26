@@ -16,12 +16,11 @@ A highly scalable, modern, and unique web platform that helps college students p
 - **Frontend**: React.js, Tailwind CSS, Framer Motion, Zustand, React Query.
 - **Backend**: Node.js, Express.js, MongoDB, Socket.io.
 - **AI**: OpenAI API (GPT-4 Turbo).
-- **DevOps**: Docker, Docker Compose.
 
 ## 📦 Setup Instructions
 
 ### Prerequisites
-- Node.js (v18+)
+- Node.js (v20+)
 - MongoDB
 - OpenAI API Key
 
@@ -36,7 +35,7 @@ A highly scalable, modern, and unique web platform that helps college students p
 2. **Backend Setup**
    ```bash
    cd server
-   cp .env.example .env
+   cp ../.env.example .env
    # Update .env with your MONGO_URI and OPENAI_API_KEY
    npm install
    npm run dev
@@ -49,11 +48,11 @@ A highly scalable, modern, and unique web platform that helps college students p
    npm run dev
    ```
 
-### Using Docker
-```bash
-cd docker
-docker-compose up --build
-```
+4. **Test API (optional)**
+   ```bash
+   # from repository root
+   node test-api.js
+   ```
 
 ## 📄 API Documentation
 API documentation is available at `http://localhost:5000/api-docs` (when Swagger is enabled).
