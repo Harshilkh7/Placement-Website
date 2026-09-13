@@ -109,4 +109,10 @@ export const useAuthStore = create((set) => ({
       set({ user: null, accessToken: null });
     }
   },
+
+  clearAuth: () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+    set({ user: null, accessToken: null });
+  },
 }));
