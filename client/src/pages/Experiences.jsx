@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { Star, PlusCircle, Building2, Calendar, ChevronRight } from 'lucide-react';
+import { api } from '../store/authStore';
 
 const Experiences = () => {
   const { data: experiences, isLoading } = useQuery({
     queryKey: ['experiences'],
     queryFn: async () => {
       const accessToken = localStorage.getItem('accessToken');
-      const response = await axios.get('/api/experiences', {
+      const response = await api.get('/api/experiences', {
         headers: accessToken ? { Authorization: 'Bearer ' + accessToken } : {}
       });
       return response.data;
@@ -58,7 +58,7 @@ const Experiences = () => {
               </div>
 
               <p className="text-surface-600 line-clamp-3 leading-relaxed font-medium">
-                {exp.aiSummary || exp.rounds[0]?.content || "No summary available."}
+                {exp.aiSummary || exp.rounds?.[0]?.content || "No summary available."}
               </p>
             </div>
 
