@@ -1,16 +1,15 @@
-import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import app from './app.js';
 import logger from './utils/logger.js';
 
 dotenv.config();
+
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/placement_portal';
+const MONGO_DB_NAME = process.env.MONGO_DB_NAME || 'placement';
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -21,12 +20,9 @@ const io = new Server(httpServer, {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/placement_portal';
-
-mongoose.connect(MONGO_URI)
+mongoose.connect(MONGO_URI, { dbName: MONGO_DB_NAME })
   .then(() => {
-    logger.info('Connected to MongoDB');
+    logger.info(`Connected to MongoDB database: ${MONGO_DB_NAME}`);
     httpServer.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
     });
@@ -36,7 +32,6 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
-// Socket.io logic
 io.on('connection', (socket) => {
   logger.info('A user connected');
 
