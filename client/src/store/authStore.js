@@ -8,6 +8,64 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+let refreshPromise = null;
+
+const refreshAccessToken = async () => {
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post(`${API_BASE_URL}/api/auth/refresh`, {}, { withCredentials: true })
+      .then((response) => {
+        const { accessToken } = response.data;
+        if (!accessToken) throw new Error('Refresh response did not include an access token');
+        localStorage.setItem('accessToken', accessToken);
+        return accessToken;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+};
+
+api.interceptors.request.use((config) => {
+  const accessToken = localStorage.getItem('accessToken');
+  if (accessToken && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    const status = error.response?.status;
+    const requestUrl = originalRequest?.url || '';
+    const isAuthRequest = requestUrl.includes('/api/auth/login') ||
+      requestUrl.includes('/api/auth/register') ||
+      requestUrl.includes('/api/auth/refresh') ||
+      requestUrl.includes('/api/auth/logout');
+
+    if (status !== 401 || !originalRequest || originalRequest._retry || isAuthRequest) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    try {
+      const accessToken = await refreshAccessToken();
+      originalRequest.headers = originalRequest.headers || {};
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      return api(originalRequest);
+    } catch (refreshError) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      window.dispatchEvent(new Event('auth:expired'));
+      return Promise.reject(refreshError);
+    }
+  },
+);
+
 export const useAuthStore = create((set) => ({
   user: JSON.parse(localStorage.getItem('user')) || null,
   accessToken: localStorage.getItem('accessToken') || null,
