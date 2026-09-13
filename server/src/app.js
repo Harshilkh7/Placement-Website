@@ -10,7 +10,7 @@ import experienceRoutes from './routes/experienceRoutes.js';
 
 const app = express();
 
-// Middlewares
+app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
@@ -21,21 +21,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/roadmaps', roadmapRoutes);
-app.use('/api/experiences', experienceRoutes);
-// app.use('/api/users', userRoutes);
-// app.use('/api/problems', problemRoutes);
-// app.use('/api/interviews', interviewRoutes);
-// app.use('/api/experiences', experienceRoutes);
-
-// Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK' });
 });
 
-// Error Handling
+app.use('/api/auth', authRoutes);
+app.use('/api/roadmaps', roadmapRoutes);
+app.use('/api/experiences', experienceRoutes);
+
 app.use(errorMiddleware);
 
 export default app;
